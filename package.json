@@ -1,0 +1,25 @@
+{
+  "name": "websocket_pastebin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mikhailvik/WebSocket_Pastebin.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mikhailvik/WebSocket_Pastebin/issues"
+  },
+  "homepage": "https://github.com/mikhailvik/WebSocket_Pastebin#readme",
+  "dependencies": {
+    "dotenv": "^18.0.8",
+    "jsonwebtoken": "^9.0.3",
+    "ws": "^8.22.0"
+  }
+}
