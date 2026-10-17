@@ -1,5 +1,6 @@
+//Moved to login.html without prompt, now using form input fields for email and password.
 // Authentication API
-const AUTH_URL = 'https://virtual-board-authentication.onrender.com/users/login'
+/*const AUTH_URL = 'https://virtual-board-authentication.onrender.com/users/login'
 
 // Login and connect to WebSocket
 async function connect() {
@@ -28,14 +29,24 @@ async function connect() {
         const data = await response.json()
         const token = data.jwt
 
+        // Save JWT in LocalStorage
+            localStorage.setItem('jwt', token)
+
         if (!token) {
             throw new Error('JWT not received!!!')
         }
+        */
+
+        // Get JWT from LocalStorage
+        const token = localStorage.getItem('jwt')
+
+        // If there is no JWT, go to login page
+        if (!token) {
+            window.location.href = 'login.html'
+        } else {
 
         // Connect to WebSocket using JWT
-        const ws = new WebSocket(
-            'ws://localhost:8080?token=' + encodeURIComponent(token)
-        )
+        const ws = new WebSocket('ws://localhost:8080?token=' + encodeURIComponent(token))
 
         // Show connection status
         ws.onopen = () => {
@@ -48,8 +59,15 @@ async function connect() {
         }
 
         // Show disconnected status
-        ws.onclose = () => {
+        ws.onclose = (event) => {
             document.getElementById('status').textContent = 'Disconnected'
+
+            // If JWT is invalid or expired - go to login.html
+            if (event.code === 1008) {
+                localStorage.removeItem('jwt')
+                window.location.href = 'login.html'
+            }
+
         }
 
         // Send text to server
@@ -60,12 +78,9 @@ async function connect() {
                 ws.send(text)
             }
         })
-
-    } catch (error) {
+    //Moved to login.html
+    /*} catch (error) {
         document.getElementById('status').textContent = error.message
         console.error(error)
-    }
+    }*/
 }
-
-// Start login
-connect()
