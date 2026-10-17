@@ -45,6 +45,7 @@ async function connect() {
             window.location.href = 'login.html'
         } else {
 
+
         // Connect to WebSocket using JWT
         const ws = new WebSocket('ws://localhost:8080?token=' + encodeURIComponent(token))
 
@@ -78,9 +79,15 @@ async function connect() {
                 ws.send(text)
             }
         })
+
     //Moved to login.html
     /*} catch (error) {
         document.getElementById('status').textContent = error.message
         console.error(error)
     }*/
+
+    // Reconnect button
+    document.getElementById('reconnect').addEventListener('click', () => {
+        window.location.reload()
+    })
 }
