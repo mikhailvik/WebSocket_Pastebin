@@ -47,7 +47,9 @@ async function connect() {
 
 
         // Connect to WebSocket using JWT
-        const ws = new WebSocket('ws://localhost:8080?token=' + encodeURIComponent(token))
+        //const ws = new WebSocket('ws://localhost:8080?token=' + encodeURIComponent(token))
+        // Connect to WebSocket server on Render using JWT
+        const ws = new WebSocket('wss://websocket-pastebin-yeua.onrender.com?token=' + encodeURIComponent(token))
 
         // Show connection status
         ws.onopen = () => {
