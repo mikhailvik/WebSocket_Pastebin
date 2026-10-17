@@ -21,12 +21,25 @@ wss.on('connection', (ws, req) => {
     try {
         // Verify JWT
         const user = jwt.verify(token, process.env.JWT_SECRET)
+
+        // Refresh tokens cannot be used for WebSocket connections del3
+        if (user.type === 'refresh') {
+            ws.close(1008, 'Authorization failed!')
+            return
+        }
+
         ws.userId = user.sub
         console.log(`User ${ws.userId} connected!`)
 
     } catch (error) {
         console.log('Authorization failed:', error.message)
-        ws.close(1008, 'Authorization failed')
+
+        // Check if JWT has expired del3
+        if (error.name === 'TokenExpiredError') {
+            ws.close(1008, 'Token expired!')
+        } else {
+            ws.close(1008, 'Authorization failed!')
+        }
         return
     }
 

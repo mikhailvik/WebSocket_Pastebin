@@ -73,7 +73,9 @@
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ email, password })
+                        //body: JSON.stringify({ email, password })
+                        // Request a 15-minute access token for WebSocket Pastebin
+                        body: JSON.stringify({ email, password, project: 'pastebin' })
                     }
                 )
 
@@ -89,6 +91,8 @@
 
                 // Save JWT in LocalStorage
                 localStorage.setItem('jwt', data.jwt)
+                // Del3 save refresh token for automatic JWT renewal
+                localStorage.setItem('refresh_token', data.refresh_token)
 
                 // Redirect to index.html after successful login
                 window.location.href = 'index.html'

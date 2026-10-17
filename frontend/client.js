@@ -40,11 +40,45 @@ async function connect() {
         // Get JWT from LocalStorage
         const token = localStorage.getItem('jwt')
 
+       
+        // Del3 Get a new access token using refresh token
+        async function refreshAccessToken() {
+            const refreshToken = localStorage.getItem('refresh_token')
+
+            if (!refreshToken) {
+                return false
+            }
+
+            try {
+                const response = await fetch('https://virtual-board-authentication.onrender.com/users/refresh', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ refresh_token: refreshToken })
+                })
+
+                if (!response.ok) {
+                    return false
+                }
+
+                const data = await response.json()
+
+                // Save new access token
+                localStorage.setItem('jwt', data.jwt)
+                return true
+
+            } catch (error) {
+                console.error('Token refresh failed:', error)
+                return false
+            }
+        }
+
+
         // If there is no JWT, go to login page
         if (!token) {
             window.location.href = 'login.html'
         } else {
-
 
         // Connect to WebSocket using JWT
         //const ws = new WebSocket('ws://localhost:8080?token=' + encodeURIComponent(token))
@@ -62,12 +96,24 @@ async function connect() {
         }
 
         // Show disconnected status
-        ws.onclose = (event) => {
+        ws.onclose = async (event) => {
             document.getElementById('status').textContent = 'Disconnected'
+
+           // If access token expired, get a new one
+            if (event.code === 1008 && event.reason === 'Token expired!') {
+                const refreshed = await refreshAccessToken()
+
+                if (refreshed) {
+                    // Reconnect with the new JWT
+                    window.location.reload()
+                    return
+                }
+            }
 
             // If JWT is invalid or expired - go to login.html
             if (event.code === 1008) {
                 localStorage.removeItem('jwt')
+                localStorage.removeItem('refresh_token') // Del 3 remove refresh token on logout
                 window.location.href = 'login.html'
             }
 
@@ -88,8 +134,37 @@ async function connect() {
         console.error(error)
     }*/
 
-    // Reconnect button
+    // Del 2 Reconnect button
     document.getElementById('reconnect').addEventListener('click', () => {
         window.location.reload()
     })
+
+    // Del 3 Logout button
+    document.getElementById('logout').addEventListener('click', async () => {
+        const refreshToken = localStorage.getItem('refresh_token')
+
+        // Delete refresh token from database
+        if (refreshToken) {
+            try {
+                await fetch('https://virtual-board-authentication.onrender.com/users/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': refreshToken
+                    }
+                })
+            } catch (error) {
+                console.error('Logout failed:', error)
+            }
+        }
+
+        // Remove tokens from LocalStorage
+        localStorage.removeItem('jwt')
+        localStorage.removeItem('refresh_token')
+
+        // Close WebSocket connection
+        ws.close()
+        // to login page
+        window.location.href = 'login.html'
+    })
+
 }
