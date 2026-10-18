@@ -3,20 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <title>WebSocket Pastebin</title>
+    
+
+<style>
+    body {
+        background-color: #f3f4f6;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .container {
+        background-color: white;
+        width: 400px;
+        max-width: calc(100% - 60px);
+        text-align: center;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        font-size: 26px;
+        color: #1f2937;
+    }
+
+    input, textarea {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        margin-top: 10px;
+    }
+
+    textarea {
+        height: 150px;
+    }
+
+    button {
+        background-color: #2563eb;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px;
+    }
+
+    button:hover {
+        background-color: #1d4ed8;
+    }
+
+    #status {
+        margin: 15px 0;
+    }
+</style>
+
 </head>
 <body>
-    <h1>My WebSocket Pastebin</h1>
+    <div class="container">
+        <h1>My WebSocket Pastebin</h1>
 
-    <input type="text" id="message" placeholder="Paste text here">
-    <button id="send">Send</button>
+        <input type="text" id="message" placeholder="Paste text here">
+        <button id="send">Send</button>
 
-    <h3>Received text:</h3>
-    <textarea id="received" rows="10" cols="50" readonly></textarea>
+        <h3>Received text:</h3>
+        <textarea id="received" rows="10" cols="50" readonly></textarea>
 
-    <p id="status">Disconnected!!!</p>
-    <!-- Reconnect button to WebSocket server -->
-    <button id="reconnect">Reconnect</button>
-    <button id="logout">Logout</button>
+        <p id="status">Disconnected! Waiting...</p>
+        <!-- Reconnect button to WebSocket server -->
+        <button id="reconnect">Reconnect</button>
+        <button id="logout">Logout</button>
+    </div>
 
     <script src="client.js"></script>
 </body>
