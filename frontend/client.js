@@ -160,7 +160,7 @@ async function connect() {
             document.getElementById('status').textContent = 'Disconnected'
 
            // If access token expired, get a new one
-            if (event.code === 1008 && event.reason === 'Token expired!') {
+            /*if (event.code === 1008 && event.reason === 'Token expired!') {
                 const refreshed = await refreshAccessToken()
 
                 if (refreshed) {
@@ -175,8 +175,20 @@ async function connect() {
                 localStorage.removeItem('jwt')
                 localStorage.removeItem('refresh_token') // Del 3 remove refresh token on logout
                 window.location.href = 'login.html'
-            }
+            }*/
 
+            //Del 3 If authorization failed, try to refresh the token
+            if (event.code === 1008) {
+                const refreshed = await refreshAccessToken()
+
+                if (refreshed) {
+                    window.location.reload()
+                } else {
+                     localStorage.removeItem('jwt')
+                    localStorage.removeItem('refresh_token')
+                    window.location.href = 'login.html'
+                }
+            }
         }
 
         // Send text to server
