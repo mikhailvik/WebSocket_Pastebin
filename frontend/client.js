@@ -38,9 +38,50 @@ async function connect() {
         */
 
         // Get JWT from LocalStorage
-        const token = localStorage.getItem('jwt')
+        let token = localStorage.getItem('jwt')
 
-       
+        // Check if access token has expired 
+        // Jag delar upp JWT-token i tre delar och läser payload-delen. Sedan avkodar jag den från Base64URL och omvandlar JSON-texten till ett JavaScript-objekt.
+        // Jag jämför tokenens utgångstid med den aktuella tiden. 
+        // Om tokenen har gått ut behöver klienten begära en ny access token med hjälp av refresh token.
+        /*
+        AI-användning – Del 3!
+
+        När jag testade min WebSocket Pastebin märkte jag att JWT-tokenen
+        gick ut efter 15 minuter, men inte alltid uppdaterades automatiskt.
+
+        Jag använde ChatGPT för att få hjälp med felsökningen och för att
+        skapa funktionen isTokenExpired().
+
+        ChatGPT hjälpte mig att förstå hur JWT-payload fungerar och hur
+        man kontrollerar tokenens utgångstid (exp).
+
+        Jag valde att skriva funktionen i enkla steg med kommentarer
+        för att lättare förstå och kunna förklara koden.
+        */
+        function isTokenExpired(token) {
+            try {
+                // JWT has three parts separated by dots
+                const parts = token.split('.')
+
+                // The second part contains the token data
+                const payload = parts[1]
+
+                // Decode the JWT payload
+                const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'))
+
+                // Convert JSON text into a JavaScript object
+                const data = JSON.parse(decoded)
+
+                // Check if the token has expired
+                return Date.now() >= data.exp * 1000
+
+            } catch (error) {
+                return true
+            }
+        }
+
+
         // Del3 Get a new access token using refresh token
         async function refreshAccessToken() {
             const refreshToken = localStorage.getItem('refresh_token')
@@ -74,6 +115,25 @@ async function connect() {
             }
         }
 
+        // Del 3 Automatically check JWT every 10 seconds
+         setInterval(async () => {
+            const currentToken = localStorage.getItem('jwt')
+
+            if (currentToken && isTokenExpired(currentToken)) {
+                 const refreshed = await refreshAccessToken()
+
+                if (refreshed) {
+                     // Reload page to reconnect with the new JWT
+                     window.location.reload()
+                } else {
+                    // Go to login if refresh token is invalid
+                    localStorage.removeItem('jwt')
+                    localStorage.removeItem('refresh_token')
+                    window.location.href = 'login.html'
+                 }
+             }
+        }, 10000)
+            
 
         // If there is no JWT, go to login page
         if (!token) {
